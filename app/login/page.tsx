@@ -1,7 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 const LoginPage = () => {
+  const router = useRouter();
   const [user, setUser] = useState({
     email: "",
     password: "",
@@ -14,9 +18,24 @@ const LoginPage = () => {
       setDisable(true);
     }
   }, [user]);
-  const submitHandler = () => {
-    console.log(user);
+  const submitHandler = async () => {
+    try {
+      const res = await axios.post("/api/users/login", user);
+      router.push("/");
+      console.log(res);
+      toast.success(res.data.message);
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
   };
+  useEffect(() => {
+    if (user.email.length > 0 && user.password.length > 0) {
+      setDisable(false);
+    } else {
+      setDisable(true);
+    }
+  }, [user]);
+
   return (
     <div className="flex bg-[#669bbc] min-h-screen justify-center items-center">
       <div className="bg-white text-black p-10 shadow-lg rounded-lg">
